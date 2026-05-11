@@ -15,11 +15,11 @@
 *.sh                text eol=lf
 
 # Windows UTF-16/Unicode files
-*.rdp               binary
-*.reg               binary
+*.rdp               text working-tree-encoding=UTF-16LE-BOM eol=crlf
+*.reg               text
 *.rc                text eol=crlf
 *.sql               text eol=crlf
-desktop.ini         binary
+desktop.ini         text
 
 # Source, config, and notes
 *.json              text eol=lf
