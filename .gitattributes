@@ -2,24 +2,24 @@
 *                   text=auto
 
 # Windows shell and PowerShell
-*.bat               text eol=crlf
-*.cmd               text eol=crlf
-*.ps1               text eol=crlf
-*.psm1              text eol=crlf
-*.psd1              text eol=crlf
-*.ps1xml            text eol=crlf
-*.psc1              text eol=crlf
-*.pssc              text eol=crlf
-*.psrc              text eol=crlf
-*.cdxml             text eol=crlf
+*.bat               text working-tree-encoding=CP1252 eol=crlf
+*.cmd               text working-tree-encoding=CP1252 eol=crlf
+*.ps1               text working-tree-encoding=UTF-8-BOM eol=crlf
+*.psm1              text working-tree-encoding=UTF-8-BOM eol=crlf
+*.psd1              text working-tree-encoding=UTF-8-BOM eol=crlf
+*.ps1xml            text working-tree-encoding=UTF-8-BOM eol=crlf
+*.psc1              text working-tree-encoding=UTF-8-BOM eol=crlf
+*.pssc              text working-tree-encoding=UTF-8-BOM eol=crlf
+*.psrc              text working-tree-encoding=UTF-8-BOM eol=crlf
+*.cdxml             text working-tree-encoding=UTF-8-BOM eol=crlf
 *.sh                text eol=lf
 
-# Windows UTF-16/Unicode files
-*.rdp               text working-tree-encoding=UTF-16LE-BOM eol=crlf
-*.reg               text
-*.rc                text eol=crlf
-*.sql               text eol=crlf
-desktop.ini         text
+# Windows files
+*.rdp               text working-tree-encoding=UTF-8-BOM eol=crlf
+*.reg               text working-tree-encoding=UTF-8-BOM eol=crlf
+*.rc                text working-tree-encoding=UTF-8-BOM eol=crlf
+*.sql               text working-tree-encoding=UTF-8-BOM eol=crlf
+desktop.ini         text working-tree-encoding=UTF-8-BOM eol=crlf
 
 # Source, config, and notes
 *.json              text eol=lf
