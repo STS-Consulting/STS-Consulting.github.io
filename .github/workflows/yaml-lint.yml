@@ -12,7 +12,7 @@ jobs:
     container: ruby:3.1-alpine
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Pull Change list
         id: changed-files
         uses: collin-miller/git-changesets@master
