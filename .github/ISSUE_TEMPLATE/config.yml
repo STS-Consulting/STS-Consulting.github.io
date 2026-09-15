@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Questions & Discussions 💬
+    url: https://github.com/STS-Consulting/STS-Consulting.github.io/discussions
+    about: Please use GitHub discussions for general questions or community conversations.
+  - name: Live Website 🌐
+    url: https://sts-consulting.github.io/
+    about: Visit the live STS-Consulting web presence.
