@@ -1,7 +1,7 @@
 ---
 description: 'Frontend web development standards, HTML5 semantics, modern CSS architecture, responsive layout, and performance.'
 applyTo: '**/*.{html,css,js}'
-version: '2609.15.1000'
+version: '2026.09.15.1000'
 ---
 
 # Web Development Standards

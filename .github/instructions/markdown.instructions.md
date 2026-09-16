@@ -1,7 +1,7 @@
 ---
 description: 'Documentation and markdown authoring standards for technical documentation, Vale linting, and web publishing.'
 applyTo: '**/*.md'
-version: '2609.15.1000'
+version: '2026.09.15.1000'
 ---
 
 # Markdown Documentation Standards
