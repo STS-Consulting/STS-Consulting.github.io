@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 2026.10.20.1645
+.VERSION 2026.10.20.2330
 .GUID 8E92F731-C034-4C3D-882E-B71589CEE72B
 .AUTHOR Scott T Surber
 .COMPANYNAME STS Consulting
@@ -8,9 +8,9 @@
 .EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS
 .EXTERNALSCRIPTDEPENDENCIES
-.PROJECTURI https://github.com/STS-Consulting/STS-Consulting.github.io
+.PROJECTURI https://github.com/STS-Consulting/PowerShell
 .LICENSEURI https://creativecommons.org/licenses/by-nc-sa/4.0/
-.ICONURI    https://github.com/STS-Consulting/STS-Consulting.github.io/raw/monad/Resources/STS.Consulting.png
+.ICONURI    https://github.com/STS-Consulting/PowerShell/raw/monad/Resources/STS.Consulting.png
 .TAGS STS PowerShell QualityAssurance Consistency Changelog CI
 .RELEASENOTES Validates repository consistency, Keep a Changelog 1.1.0 compliance, and CalVer alignment.
 .PRIVATEDATA
@@ -93,8 +93,8 @@ begin {
     )
 
     $canonicalLicense = 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
-    $canonicalProject = 'https://github.com/STS-Consulting/STS-Consulting.github.io'
-    $canonicalIcon    = 'https://github.com/STS-Consulting/STS-Consulting.github.io/raw/monad/Resources/STS.Consulting.png'
+    $canonicalProject = 'https://github.com/STS-Consulting/PowerShell'
+    $canonicalIcon    = 'https://github.com/STS-Consulting/PowerShell/raw/monad/Resources/STS.Consulting.png'
 
     $results = [System.Collections.Generic.List[pscustomobject]]::new()
 
@@ -222,6 +222,9 @@ process {
         if ($stagedFiles.Count -gt 0) {
             $stagedCodeFiles = $stagedFiles | Where-Object {
                 $PSItem -match '\.(ps1|psm1|psd1|cs)$' -and $PSItem -notmatch '(^Documentation[/\\]|Test-RepositoryConsistency)'
+            } | Where-Object {
+                $fileDiff = git diff --cached -I '^\s*#' -- $PSItem 2>$null
+                [bool]$fileDiff
             }
 
             if ($stagedCodeFiles.Count -gt 0) {
@@ -319,8 +322,8 @@ end {
 # SIG # Begin signature block
 # MIIcRAYJKoZIhvcNAQcCoIIcNTCCHDECAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCBRaoSlVeAqreQq
-# 0HwqhJw3iwuiu5Wdb3EXUtAh3ih1KKCCFnYwggM4MIICIKADAgECAhBq68etXxgs
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCCwTa9VwmqortQP
+# 2JON0Fr9J5xOEI8hQT6yQpxENuOLE6CCFnYwggM4MIICIKADAgECAhBq68etXxgs
 # l0IzUnGnriXYMA0GCSqGSIb3DQEBCwUAMDQxMjAwBgNVBAMMKUF1dGhlbnRpY29k
 # ZSBDb2RlU2lnbmluZ0NlcnQgMjYwOC4zMC4yMTM5MB4XDTI2MDgzMTA0MjkyNFoX
 # DTI3MDgzMTA0NDkyNFowNDEyMDAGA1UEAwwpQXV0aGVudGljb2RlIENvZGVTaWdu
@@ -444,28 +447,28 @@ end {
 # dGljb2RlIENvZGVTaWduaW5nQ2VydCAyNjA4LjMwLjIxMzkCEGrrx61fGCyXQjNS
 # caeuJdgwDQYJYIZIAWUDBAIBBQCggYQwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKA
 # ADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYK
-# KwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgQYA8AETT7VW4dXdF2FO0GR7fr1Q5
-# OtC4dauvuZSjUxAwDQYJKoZIhvcNAQEBBQAEggEAG4BSL0wnZhKtvWS9Ah3ibvlA
-# NGYv4NdRRw7ll38OwiwuPSvXV31IU3n3UifzVRmK2wTYnbhspqB0qaT6Xs4pAPsK
-# cEVoZejaiDX9fb8CBXxXRXfERgjnxHhVkZXdwDKfRTCN3FG6/0c5Dg9U9pnCCHMq
-# hLCsnBIcAopWnyu8yrcRdVXPU0GwEHb9RaeiY5feeCRYhvVhAX9jPOCEQ0sxymwA
-# NTRJSX5+VoQt8hgXuV5NankZOSmBaL6FOe381wo3SCP5CeO6vMVLlHdOK5IoDMI0
-# 9Zeg/Jes7+BegntDt6kaomGyzZGRTwcT6kjetOeZNe485+wLvu3lqO9HwpW+36GC
+# KwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgwXI5N6T/fQvonzNRMgGHZ2MmIho/
+# TOxlhT3dEsh8a2wwDQYJKoZIhvcNAQEBBQAEggEAVXy8Jf1G8Fx6HQsT0BrpZ+Gl
+# O3PufOMq49YIM7/QT4At7CZSJ9o1QU7brF2sfmsgGTaPNb12s8WJe3mcYmocEvkp
+# SZRIijIk/pkSrhpMXEwUi+ZzPZM9oDC3v7vfBu9EvLaJYiLzJYIXU3qkXU46+PQY
+# 6KpDJSJQXrZJ4H0GUhhSyV3pj/1bydRHsG1MXw8jXpS3kd/shy9b3fxDYegv4x7+
+# 71Ozp/oktoQcrLsAeFWH6fNw/9li5ncwiR8+hDpPQ5auqfBkoQmxT6eFP4zfq0jL
+# +aPcRd3A9t/1Dl0enayksF+d3GaLZSGTi3gzWncghZFTVq0HFaTKSyPibuih+aGC
 # AyYwggMiBgkqhkiG9w0BCQYxggMTMIIDDwIBATB9MGkxCzAJBgNVBAYTAlVTMRcw
 # FQYDVQQKEw5EaWdpQ2VydCwgSW5jLjFBMD8GA1UEAxM4RGlnaUNlcnQgVHJ1c3Rl
 # ZCBHNCBUaW1lU3RhbXBpbmcgUlNBNDA5NiBTSEEyNTYgMjAyNSBDQTECEAhP3DNP
 # fkVO28MPj/mSGDUwDQYJYIZIAWUDBAIBBQCgaTAYBgkqhkiG9w0BCQMxCwYJKoZI
-# hvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjEwMjAyMzU3MTJaMC8GCSqGSIb3DQEJ
-# BDEiBCA0uhocVj1NPc0x47Dsh5lOgYCBAk1Dyr15EiiflSxvDzANBgkqhkiG9w0B
-# AQEFAASCAgBkjaoyXFEpWSwEKfsRHEnlSupQd04fOGupUdNqWhjaNUAsob/UYnM/
-# KMGh2Enfc32Dff9k5D7CgaRcPO79oz0/ZhY+fepVGDyoGdjUskk6nzPOvPL8f31I
-# xkYzgUkwcnr8of2feUIcLEWVU/anbYmVhki7c1ZHHdRRdX7lb6anxxVGeNsMBNil
-# moaoOIvg93j44XdaVus7tAAHUt18XQC0XhumUPTm5ii+V2VoQadwp2hn7z2J/x/X
-# Wd1POcACFADEc/lzIFAu8cN6eAnJeokdZBK4wC4FhOo9JjQ9aM91Gq2POMGgTSok
-# GEnLoaDrf1snpnAqYFx9U3Bb5ISZ3h+hiz80lC5dBlgEjAtdUq672s8TsLP0oudj
-# Ua1eZEPPDhJXJi3NXBz/btR+Z0kNzC4AinLT8H4ZRjsZ2RorHDYXZmwrG1vjS2E3
-# atF1geV+86tlDrYhxGl8ZFx1M1przKd0s7lnBGkjNHEZuNAKdC4nCBsvwbDWZwAH
-# 2Mu1eqtGkQLhiR3oo1oP9aQMlQko2FM/tbjVDesuzWXxakAf+BDD9pPYRzTmv5TH
-# HRkLOJgkJkAb8BKCUAYtLSySQLJplfdmWLHkQd1P1y7lQan3MXO/v70dLz9nAfsA
-# oMEehp8ObreoD+Y40QO2ssGl5/CQvqC3sEiyoNYkqqReCycAjnyCwQ==
+# hvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjEwMjEwNjMxMTZaMC8GCSqGSIb3DQEJ
+# BDEiBCCWBUnM5Wew6vl42T0pNmW4xIlgy2hmHqz75CxmwwnQxzANBgkqhkiG9w0B
+# AQEFAASCAgAKhSdQ0x9B+viNk6A6UC9vRvvp3qlYuFASt3fmhg3m+ds4mEb1b7JZ
+# 6KkDQX+3Rql3NI9bdTQskWxHOXTSHFb1ie6KscVoO2jaE29gXl31+SY+CG5o5lhn
+# vdfcFXKmy7cWnNeB34jTnOMU9cIOilQ2LYeZIxVHfCZ5FY2uHnOm4ln4pvIAbx0l
+# ir/bjIMICin51KN+nYaeOHp6d8Xjvdki5E31i1Isga6BZZZLxo1FpiZALLY6k8kd
+# k4wwCXzbDtABlUr4w8D5iT7eDyaGw+a8OLVgfFRaPOI2s5g8nfFY9iJvbShUOgez
+# BejMnzriHkRUXAFJAnbL0yHsyj6G/f07th12RfUju45SD3FmWQz3TO7CM8mxvbh2
+# /Dfksey9hq5Num4jmneWAbg5aBSXlTqj2bMNvBsBOGak4xckwB1UkbkQDV6IV8Xo
+# QmGB3h8gYWdi+ifSa9Pv2wKnstwV9i6hvl1YTDKEGpiFqpegzHhxnBFPYRS6+G6I
+# Lfkc5LZaI2xQFhAkXjIur8pZWKoIsWW2oYIhNOSDsBCUSSaqPXDGMIzpvfRWvbvj
+# oZ1RskwVEZF9jNauA6MT41XnfdPfLxEJCdM0nTHe5Hjjye+F4g74wVDCdiFP78Tg
+# InPYJvJo4fiAVVRrEacBDogIvj1Q+x7F7d6dOIGiqqmf8alWrlYlsA==
 # SIG # End signature block
