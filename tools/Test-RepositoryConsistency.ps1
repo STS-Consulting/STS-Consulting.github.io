@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 2026.10.20.2330
+.VERSION 2026.10.20.2300
 .GUID 8E92F731-C034-4C3D-882E-B71589CEE72B
 .AUTHOR Scott T Surber
 .COMPANYNAME STS Consulting
@@ -92,9 +92,10 @@ begin {
         [System.StringComparer]::OrdinalIgnoreCase
     )
 
+    $repoLeaf = Split-Path -Path $RootPath -Leaf
     $canonicalLicense = 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
-    $canonicalProject = 'https://github.com/STS-Consulting/PowerShell'
-    $canonicalIcon    = 'https://github.com/STS-Consulting/PowerShell/raw/monad/Resources/STS.Consulting.png'
+    $canonicalProject = "https://github.com/STS-Consulting/$repoLeaf"
+    $canonicalIcon    = "https://github.com/STS-Consulting/$repoLeaf/raw/monad/Resources/STS.Consulting.png"
 
     $results = [System.Collections.Generic.List[pscustomobject]]::new()
 
@@ -218,28 +219,34 @@ process {
     # # ## ### ##### ######### ############# ##################### ##################################
     # 2. Git Staged / Pre-Commit Validation (when -VerifyGitStaged is specified)
     if ($VerifyGitStaged) {
-        $stagedFiles = @(git diff --cached --name-only)
-        if ($stagedFiles.Count -gt 0) {
-            $stagedCodeFiles = $stagedFiles | Where-Object {
-                $PSItem -match '\.(ps1|psm1|psd1|cs)$' -and $PSItem -notmatch '(^Documentation[/\\]|Test-RepositoryConsistency)'
-            } | Where-Object {
-                $fileDiff = git diff --cached -I '^\s*#' -- $PSItem 2>$null
-                [bool]$fileDiff
-            }
+        $isGitRepo = (git -C $RootPath rev-parse --is-inside-work-tree 2>$null) -eq 'true'
+        if ($isGitRepo) {
+            $stagedFiles = @(git -C $RootPath diff --cached --name-only)
+            if ($stagedFiles.Count -gt 0) {
+                $stagedCodeFiles = $stagedFiles | Where-Object {
+                    $PSItem -match '\.(ps1|psm1|psd1|cs)$' -and $PSItem -notmatch '(^Documentation[/\\]|Test-RepositoryConsistency|^\.vscode[/\\])'
+                } | Where-Object {
+                    $fileDiff = git -C $RootPath diff --cached -I '^\s*#' -I '^\s*(\.VERSION|ModuleVersion)\b' -- $PSItem 2>$null
+                    [bool]$fileDiff
+                }
 
-            if ($stagedCodeFiles.Count -gt 0) {
-                $changelogStaged = $stagedFiles | Where-Object { $PSItem -match 'CHANGELOG\.md$' }
-                $hasChangelogStaged = [bool]$changelogStaged
-                $stagedMsg = if ($hasChangelogStaged) {
-                    "Changelog is staged alongside code changes ($($stagedCodeFiles.Count) files)"
+                if ($stagedCodeFiles.Count -gt 0) {
+                    $changelogStaged = $stagedFiles | Where-Object { $PSItem -match 'CHANGELOG\.md$' }
+                    $hasChangelogStaged = [bool]$changelogStaged
+                    $stagedMsg = if ($hasChangelogStaged) {
+                        "Changelog is staged alongside code changes ($($stagedCodeFiles.Count) files)"
+                    }
+                    else {
+                        "Code files staged ($($stagedCodeFiles.Count) files: $($stagedCodeFiles -join ', ')), but .github/CHANGELOG.md was not staged for commit"
+                    }
+                    Add-CheckResult -Category 'GitCheckin' -Target '.github/CHANGELOG.md' -Check 'ChangelogStagedWithCodeChanges' -Passed $hasChangelogStaged -Message $stagedMsg
                 }
                 else {
-                    "Code files staged ($($stagedCodeFiles.Count) files), but .github/CHANGELOG.md was not staged for commit"
+                    Add-CheckResult -Category 'GitCheckin' -Target 'GitStaged' -Check 'ChangelogStagedWithCodeChanges' -Passed $true -Message 'No code modifications staged'
                 }
-                Add-CheckResult -Category 'GitCheckin' -Target '.github/CHANGELOG.md' -Check 'ChangelogStagedWithCodeChanges' -Passed $hasChangelogStaged -Message $stagedMsg
             }
             else {
-                Add-CheckResult -Category 'GitCheckin' -Target 'GitStaged' -Check 'ChangelogStagedWithCodeChanges' -Passed $true -Message 'No code modifications staged'
+                Add-CheckResult -Category 'GitCheckin' -Target 'GitStaged' -Check 'ChangelogStagedWithCodeChanges' -Passed $true -Message 'No files staged for commit'
             }
         }
     }
@@ -322,8 +329,8 @@ end {
 # SIG # Begin signature block
 # MIIcRAYJKoZIhvcNAQcCoIIcNTCCHDECAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCCwTa9VwmqortQP
-# 2JON0Fr9J5xOEI8hQT6yQpxENuOLE6CCFnYwggM4MIICIKADAgECAhBq68etXxgs
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCDm7h6KVUz8lPJN
+# eq/XDo+2v8ajw5aHxfVFc+7gQom476CCFnYwggM4MIICIKADAgECAhBq68etXxgs
 # l0IzUnGnriXYMA0GCSqGSIb3DQEBCwUAMDQxMjAwBgNVBAMMKUF1dGhlbnRpY29k
 # ZSBDb2RlU2lnbmluZ0NlcnQgMjYwOC4zMC4yMTM5MB4XDTI2MDgzMTA0MjkyNFoX
 # DTI3MDgzMTA0NDkyNFowNDEyMDAGA1UEAwwpQXV0aGVudGljb2RlIENvZGVTaWdu
@@ -447,28 +454,28 @@ end {
 # dGljb2RlIENvZGVTaWduaW5nQ2VydCAyNjA4LjMwLjIxMzkCEGrrx61fGCyXQjNS
 # caeuJdgwDQYJYIZIAWUDBAIBBQCggYQwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKA
 # ADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYK
-# KwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQgwXI5N6T/fQvonzNRMgGHZ2MmIho/
-# TOxlhT3dEsh8a2wwDQYJKoZIhvcNAQEBBQAEggEAVXy8Jf1G8Fx6HQsT0BrpZ+Gl
-# O3PufOMq49YIM7/QT4At7CZSJ9o1QU7brF2sfmsgGTaPNb12s8WJe3mcYmocEvkp
-# SZRIijIk/pkSrhpMXEwUi+ZzPZM9oDC3v7vfBu9EvLaJYiLzJYIXU3qkXU46+PQY
-# 6KpDJSJQXrZJ4H0GUhhSyV3pj/1bydRHsG1MXw8jXpS3kd/shy9b3fxDYegv4x7+
-# 71Ozp/oktoQcrLsAeFWH6fNw/9li5ncwiR8+hDpPQ5auqfBkoQmxT6eFP4zfq0jL
-# +aPcRd3A9t/1Dl0enayksF+d3GaLZSGTi3gzWncghZFTVq0HFaTKSyPibuih+aGC
+# KwYBBAGCNwIBFTAvBgkqhkiG9w0BCQQxIgQg/RbstO5pRoE70jQ1qONMiJnG+4ig
+# lZN6K2JqNEQATwEwDQYJKoZIhvcNAQEBBQAEggEAZS2UGo6uVmxv7HqJlGCNaC9+
+# OVu8gIM+LZhjY5O4s4f6m+nt7vzNQTbDua2mcUynV2H9Rh+x7KEK8MpNch6WQVSJ
+# Dn44Py9/YY7QhUqc9jVQEHPp0MPutxB5vrQHJas0u1YLTAwJ6U6A7sVXq8JHpVVG
+# 2X99rLgeceqov+nA4Ax5bEjNeZtq/IAL4+dqVjK6zw2v25CI7Vgi1vB3YkcJuv7J
+# l48KdYJ/oskeFY9icF0QYB4EB5xn5bjI4vbcb4KbAFIjzfpBcAEDCZ/FTgwHLrke
+# AZ7rD3H98ZEjVdGL1bzqX3Cozf1K6oR5dA2aOPeNAXk04IT3L8PLX6o5E87lBqGC
 # AyYwggMiBgkqhkiG9w0BCQYxggMTMIIDDwIBATB9MGkxCzAJBgNVBAYTAlVTMRcw
 # FQYDVQQKEw5EaWdpQ2VydCwgSW5jLjFBMD8GA1UEAxM4RGlnaUNlcnQgVHJ1c3Rl
 # ZCBHNCBUaW1lU3RhbXBpbmcgUlNBNDA5NiBTSEEyNTYgMjAyNSBDQTECEAhP3DNP
 # fkVO28MPj/mSGDUwDQYJYIZIAWUDBAIBBQCgaTAYBgkqhkiG9w0BCQMxCwYJKoZI
-# hvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjEwMjEwNjMxMTZaMC8GCSqGSIb3DQEJ
-# BDEiBCCWBUnM5Wew6vl42T0pNmW4xIlgy2hmHqz75CxmwwnQxzANBgkqhkiG9w0B
-# AQEFAASCAgAKhSdQ0x9B+viNk6A6UC9vRvvp3qlYuFASt3fmhg3m+ds4mEb1b7JZ
-# 6KkDQX+3Rql3NI9bdTQskWxHOXTSHFb1ie6KscVoO2jaE29gXl31+SY+CG5o5lhn
-# vdfcFXKmy7cWnNeB34jTnOMU9cIOilQ2LYeZIxVHfCZ5FY2uHnOm4ln4pvIAbx0l
-# ir/bjIMICin51KN+nYaeOHp6d8Xjvdki5E31i1Isga6BZZZLxo1FpiZALLY6k8kd
-# k4wwCXzbDtABlUr4w8D5iT7eDyaGw+a8OLVgfFRaPOI2s5g8nfFY9iJvbShUOgez
-# BejMnzriHkRUXAFJAnbL0yHsyj6G/f07th12RfUju45SD3FmWQz3TO7CM8mxvbh2
-# /Dfksey9hq5Num4jmneWAbg5aBSXlTqj2bMNvBsBOGak4xckwB1UkbkQDV6IV8Xo
-# QmGB3h8gYWdi+ifSa9Pv2wKnstwV9i6hvl1YTDKEGpiFqpegzHhxnBFPYRS6+G6I
-# Lfkc5LZaI2xQFhAkXjIur8pZWKoIsWW2oYIhNOSDsBCUSSaqPXDGMIzpvfRWvbvj
-# oZ1RskwVEZF9jNauA6MT41XnfdPfLxEJCdM0nTHe5Hjjye+F4g74wVDCdiFP78Tg
-# InPYJvJo4fiAVVRrEacBDogIvj1Q+x7F7d6dOIGiqqmf8alWrlYlsA==
+# hvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yNjEwMjEwNjEwMjFaMC8GCSqGSIb3DQEJ
+# BDEiBCD0edZzHPh9nBGRn88bSfrrwQEDeVaSQ+poh4CjF286ETANBgkqhkiG9w0B
+# AQEFAASCAgAopAqmaThZoDlnReD23n4IW/flKVUAqL+AE8OBOrDqQVTjUb+Nhlet
+# 4Dn29lJLdS7JQyh27zU+CaNOKIKRR9PcRq3Y3WzY6Kfb+YcQKZkQeGXCb2Eoi0bY
+# jToZlNIFQWZidpObmBXxaYhtCX2mtj0LMKraGLhfGYd0GS74i+OkT4et2sm0Qhp3
+# Jqw4Z1Co4aju2/7ExTd4uirsBWAUb4tFlo78jdRqofCJZxsZ1JhgSTVFXqcvJAZs
+# vO+FXP06n0JZHZuN9mBa4Vi+021/V82W6c3hpu1XuPoBairTR+eDgDwcJCrwP2yV
+# J7MyhHsx36S0aLp5hwc4C3i6Y1VovRj/NmQSs7LBhi6E+AXtpU9dCBr0soXwnZ8E
+# g8CmWs4AsgtsycYbYjRF7LUmnJBmMof3GdvdO1b6l970wGEbBKX/gio9gJplgwho
+# 3RSlMHrtL88PRJLGJMFAs1+cWM92yE1h6kZjaY2dE9h8CO0NW6lh8tR8AzR6Lfey
+# aNFBivM/bep3M7PFc369vmadybVh4AMm3uEMWaGA8TE7aQYfywzPz0bo8TJ77xqG
+# J/ZjCIbLGccWdwEPF4vUFu1HjkWjOkunx9OoSmW5J8CGdEMTdTZB4tQzTzYPmnLA
+# 6tQCVOzSi306ySOCqsTFa5pdVtJrCXVFOCGWJiENYIejZFCn7hnbbw==
 # SIG # End signature block
