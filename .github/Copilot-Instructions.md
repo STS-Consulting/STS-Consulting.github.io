@@ -97,3 +97,4 @@ Contextual instructions are automatically loaded by GitHub Copilot based on acti
 - **Strict Requirement:** All releases, module manifests, git tags, changelog entries, and instruction headers strictly adhere to **Calendar Versioning (CalVer)** using YYYY.MM.DD.HHmm (e.g., $exampleVer).
 - **Prohibition:** Semantic Versioning (SemVer / MAJOR.MINOR.PATCH) is **strictly prohibited**.
 
+
