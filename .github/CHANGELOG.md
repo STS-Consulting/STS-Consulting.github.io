@@ -19,6 +19,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/) (YYYY.0M.
 - Consistency: Added `.cursor/rules/repository-consistency.mdc` and automated consistency validation script `tools/Test-RepositoryConsistency.ps1`.
 
 ### Changed
+- Coding Standards: Prohibited casting to [void] in addition to Out-Null; unneeded output must be discarded by assigning to $null = ....
 
 - Updated repository license to Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (`CC BY-NC-SA 4.0`).
 
