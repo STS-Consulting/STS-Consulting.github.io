@@ -7,6 +7,18 @@ and this project adheres to [Calendar Versioning](https://calver.org/) (YYYY.0M.
 
 ## [Unreleased]
 
+## [2026.10.24] - 2026-10-24
+
+### Changed
+
+- Maintenance and version synchronization release.
+
+## [2026.10.24] - 2026-10-24
+
+### Changed
+
+- Maintenance and version synchronization release.
+
 ## [2026.10.20] - 2026-10-20
 
 ### Added
@@ -23,5 +35,9 @@ and this project adheres to [Calendar Versioning](https://calver.org/) (YYYY.0M.
 
 - Updated repository license to Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (`CC BY-NC-SA 4.0`).
 
-[unreleased]: https://github.com/STS-Consulting/STS-Consulting/compare/2026.10.20...HEAD
 [2026.10.20]: https://github.com/STS-Consulting/STS-Consulting/releases/tag/2026.10.20
+
+[2026.10.24]: https://github.com/STS-Consulting/STS-Consulting/compare/2026.10.20...2026.10.24
+
+[unreleased]: https://github.com/STS-Consulting/STS-Consulting/compare/2026.10.24...HEAD
+[2026.10.24]: https://github.com/STS-Consulting/STS-Consulting/compare/2026.10.20...2026.10.24
